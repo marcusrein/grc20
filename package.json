@@ -1,0 +1,10 @@
+{
+  "name": "grc20",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@graphprotocol/grc-20": "^0.6.4",
+    "dotenv": "^16.4.7",
+    "ethers": "^5.7.2"
+  }
+}
