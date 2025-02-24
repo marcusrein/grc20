@@ -33,7 +33,6 @@ console.log('Person type created:', { personTypeId });
 
 async function main() {
   try {
-    // Create a restaurant entity
     const restaurantTypeId = Id.generate();
     const { id: restaurantId, ops: createRestaurantOps } = Graph.createEntity({
       name: 'Yum Yum',
@@ -89,7 +88,7 @@ async function main() {
       },
       body: JSON.stringify({ 
         cid: cid,
-        network: "TESTNET"
+        network: "MAINNET"
       }),
     });
 
