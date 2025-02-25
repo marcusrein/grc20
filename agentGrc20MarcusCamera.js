@@ -1,4 +1,4 @@
-import { Graph, Ipfs, Id } from "@graphprotocol/grc-20";
+import { Graph, Ipfs, Id, Triple } from "@graphprotocol/grc-20";
 import dotenv from "dotenv";
 import { ethers } from "ethers";
 dotenv.config();
@@ -6,67 +6,49 @@ dotenv.config();
 // Constants
 const SPACE_ID = "MucL11M5HLWvLSVryrNKPB";
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
-const NETWORK = "MAINNET"; // Changed to MAINNET as the space exists on MAINNET
+const NETWORK = "MAINNET"; // Space exists on MAINNET
 
 // Initialize array to store all operations
 const ops = [];
 
-// Create a timestamp for unique entity naming
+// Create a timestamp for unique operation naming
 const timestamp = new Date().toISOString();
 console.log(`Starting script at ${timestamp}`);
 
-// Create an image URL property
-const { id: imageUrlPropertyId, ops: createImageUrlPropertyOps } = Graph.createProperty({
-	type: "URL",
-	name: "ImageUrl",
+// Create a hair type property
+const { id: hairTypePropertyId, ops: createHairTypePropertyOps } = Graph.createProperty({
+	type: "TEXT", // Using TEXT type which is supported
+	name: "HairType",
 });
-ops.push(...createImageUrlPropertyOps);
-console.log("Image URL property created:", { imageUrlPropertyId });
+ops.push(...createHairTypePropertyOps);
+console.log("Hair Type property created:", { hairTypePropertyId });
 
-// Create a rating property (using NUMBER instead of STRING)
-const { id: ratingPropertyId, ops: createRatingPropertyOps } = Graph.createProperty({
-	type: "NUMBER",
-	name: "Rating",
-});
-ops.push(...createRatingPropertyOps);
-console.log("Rating property created:", { ratingPropertyId });
-
-// Create an image type
-const { id: imageTypeId, ops: createImageTypeOps } = Graph.createType({
-	name: "Image",
-	properties: [imageUrlPropertyId, ratingPropertyId],
-});
-ops.push(...createImageTypeOps);
-console.log("Image type created:", { imageTypeId });
+// Define the existing Marcus entity ID from the Accounts section in the screenshot
+// This is the account address shown in the UI
+const MARCUS_ENTITY_ID = "0xEE90460D28FF72fDFC0b5a9401D227Cd6BBceEab";
 
 async function main() {
 	try {
-		console.log("=== Starting entity creation process ===");
+		console.log("=== Starting entity update process ===");
 		
-		// Create a simple image entity
-		const { id: imageId, ops: createImageOps } = Graph.createEntity({
-			name: `Test Image ${timestamp}`,
-			types: [imageTypeId],
-			properties: {
-				[imageUrlPropertyId]: {
-					type: "URL",
-					value: "https://example.com/image.jpg",
-				},
-				[ratingPropertyId]: {
-					type: "NUMBER",
-					value: "5", // Rating as a string that will be converted to number
-				},
+		// Create a triple to set the hair type property on the Marcus entity
+		const setHairTripleOp = Triple.make({
+			entityId: MARCUS_ENTITY_ID,
+			attributeId: hairTypePropertyId,
+			value: {
+				type: "TEXT",
+				value: "bald",
 			},
 		});
-		ops.push(...createImageOps);
-		console.log("Image entity created:", { imageId });
+		ops.push(setHairTripleOp);
+		console.log("Hair type triple created for entity ID:", MARCUS_ENTITY_ID);
 
 		// Publish to IPFS
 		console.log("Publishing to IPFS...");
 		const cid = await Ipfs.publishEdit({
-			name: `Create Test Image ${timestamp}`,
+			name: `Update Marcus Hair Type ${timestamp}`,
 			ops: ops,
-			author: imageId,
+			author: MARCUS_ENTITY_ID, // Using Marcus as the author of the edit
 		});
 		console.log("Published to IPFS with CID:", cid);
 
@@ -166,7 +148,7 @@ async function main() {
 				console.log("Gas used:", receipt.gasUsed.toString());
 				
 				// Provide a link to view the entity in the geobrowser
-				console.log(`View your entity in the geobrowser: https://geobrowser.io/space/${SPACE_ID}`);
+				console.log(`View your updated entity in the geobrowser: https://geobrowser.io/space/${SPACE_ID}`);
 				
 				return {
 					cid,
