@@ -23,9 +23,7 @@ const { id: hairTypePropertyId, ops: createHairTypePropertyOps } = Graph.createP
 ops.push(...createHairTypePropertyOps);
 console.log("Hair Type property created:", { hairTypePropertyId });
 
-// Define the existing Marcus entity ID from the Accounts section in the screenshot
-// This is the account address shown in the UI
-const MARCUS_ENTITY_ID = "0xEE90460D28FF72fDFC0b5a9401D227Cd6BBceEab";
+const MARCUS_ENTITY_ID = "FuvKkspixpHymrWbrRZDfc";
 
 async function main() {
 	try {
